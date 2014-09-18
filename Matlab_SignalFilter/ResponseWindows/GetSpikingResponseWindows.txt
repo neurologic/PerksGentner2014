@@ -1,0 +1,53 @@
+thisdata = data(istim).spikes
+
+% there are probably a number of ways to modify the way to choose the width of the gaussian filter for smoothing the spikes vector
+% i chose to use a measure of the isi durations to base my gaussian filter off of
+% i think marvin has a slick way of choosing the gaussian filter width and his code for it is probably super genralizable
+% but this is what I do:
+
+trialisi = []; %for each trial, get the median isi; 
+for itrial = 1:size(thisdata,1)
+    trialisi(itrial) = median(diff(find(thisdata(itrial,:) ==1)));
+end
+
+sampisi = round(mean(trialisi)); %get a mean of the median isi across trials
+if isnan(sampisi) || sampisi == 0 || sampisi >= sigon % if there are no spikes or the mean isi is REALLY long, then choose these (kind of arbitrary) filter parameters 
+    sampisi = 0;
+    gausstosmooth = fspecial('gaussian', [200*8,1],200);
+    gausstosmooth = gausstosmooth/max(gausstosmooth);
+end
+if ~isnan(sampisi) && sampisi > 0; % if the isi measurement is reasonable, then use it to shape the filter
+        %     gausstosmooth = fspecial('gaussian', [allisi*4,1],allisi/2); % i have played around with different scaling factors on the isi for the filter parameters
+    gausstosmooth = fspecial('gaussian', [sampisi*8,1],sampisi); % create a gaussian filter using a scaled isi for the filter parameters
+    gausstosmooth = gausstosmooth/max(gausstosmooth); %normalize the filter to a max of 1
+end
+    
+smoothspk = []; % here I fill out a matrix (trials X samples) for the smoothed spike trains
+for itrial = 1:size(thisdata,1)
+    smoothspk(itrial,:) = conv(thisdata(itrial,:),gausstosmooth,'same');
+end
+    %                 input_struct.sigdata_filt = smoothspk;
+ 
+% these are the parameters that I used for spiking activity that gave me the most reasonable results, 
+% but you will want to play around with these parameters to see what effect it has 
+% on the lumping and splitting and detection of putative spiking repsonses  
+dt = 1/bps; %for me the sampling rate bps = 10000
+binwidth = 0.05; %seconds 
+conf_p = 95;
+windowsize = (binwidth / dt);  % in samples; for me this comes out to 500 sample-wide analysis window
+binsize = 10; %samples
+bin_p = 0.85;
+
+% get the confidence bounds on the mean (across trials) spike density function during the pre-stimulus period
+confint_spk = getCDFconf (mean(smoothspk(:,1:sigon-sampisi)),conf_p); % i wrote this function 
+%     quantile(mean(smoothspk(:,1:sigon-sampisi)),conf_p); %quantile is another function you can use to get confidence intervals that i didn't know about when i wrote "getCDF"
+
+% get indices for response windows for whatever part of the data you want, here the stimulus period
+% you want to do the same for the baseline period to get an estimate of the false alarms expected for responses that maybe aren't responses    
+up_inds, low_inds] = WindowResponse(mean(smoothspk(:,sigon:end)), confint, windowsize, binsize, bin_p);
+
+% now turn those vectors of indices into onset-offset pairs for each response 
+% (here i added back in the stimulus onset time to reference the response window onset/offset times to the beginning of the trial for plotting
+up_win = getWindowEdges (up_inds, 1, 1)+sigon;
+low_win = getWindowEdges (low_inds, 1, 1)+sigon;
+    

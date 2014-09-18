@@ -1,0 +1,53 @@
+#plotting segmented responses
+
+spkrespfig = figure;
+hold on
+subplot(2,1,1)
+hold on
+for itrial = 1:size(smoothspk,1)
+	thesespks = find(thisbase(itrial,:))*dt;
+	for ispike = 1:size(thesespks,2)
+		line([thesespks(ispike),thesespks(ispike)],...
+			[1*itrial,(1*itrial)+1],'color','k')
+	end
+end
+set(gca, 'YLim',[1,size(smoothspk,1)+1],'XLim',[1*dt,size(smoothspk,2)*dt])
+
+SigTimeBox(gca, (sigon)*dt,size(thisbase,2)*dt, get(gca,'YLim'),[0.5 0.5 0.5]);
+for iresp=1:size(up_win_spk,2)
+	SigTimeBox(gca, up_win_spk(1,iresp)*dt, ...
+		up_win_spk(2,iresp)*dt, get(gca,'YLim'),'r');
+end
+for inhib=1:size(low_win_spk,2)
+	SigTimeBox(gca, low_win_spk(1,inhib)*dt, ...
+		low_win_spk(2,inhib)*dt, get(gca,'YLim'),'b');
+end
+axis tight
+set(gca,'TickDir','out')
+box off
+
+subplot(2,1,2)
+hold on
+for itrial = 1:size(smoothspk,1)
+	thesespks = find(thisgz(itrial,:))*dt;
+	for ispike = 1:size(thesespks,2)
+		line([thesespks(ispike),thesespks(ispike)],...
+			[1*itrial,(1*itrial)+1],'color','k')
+	end
+end
+set(gca, 'YLim',[1,size(smoothspk,1)+1],'XLim',[1*dt,size(smoothspk,2)*dt])
+
+SigTimeBox(gca, (sigon)*dt,size(thisbase,2)*dt, get(gca,'YLim'),[0.5 0.5 0.5]);
+for iresp=1:size(up_win_spk,2)
+	SigTimeBox(gca, up_win_spk(1,iresp)*dt, ...
+		up_win_spk(2,iresp)*dt, get(gca,'YLim'),'r');
+end
+for inhib=1:size(low_win_spk,2)
+	SigTimeBox(gca, low_win_spk(1,inhib)*dt, ...
+		low_win_spk(2,inhib)*dt, get(gca,'YLim'),'b');
+end
+axis tight
+set(gca,'TickDir','out')
+box off
+
+set(spkrespfig,'Position',[212         523        1168         283])
