@@ -19,6 +19,10 @@ set(0,'DefaultAxesColorOrder',[0 0 0;1 0 1;0 1 1])
 %%
 % "repexpts" is a list of experiments for which there were stimuli blocks
 % of 5 trials or more in current clamp
+
+% saved in:
+% '/Users/kperks/GitHub/PerksGentner2014/WholeCellData_repexpts/'
+
 repexpts = {
     'KP_B130_131120_p1c1a.mat'
     'KP_B130_131120_p1c2a.mat'
@@ -48,7 +52,6 @@ repexpts = {
 
 for icell = 1:size(repexpts,1)
     rootname{icell} = repexpts{icell}(1:19);
-    
 end
 unq_expts = unique(rootname); % some different experiment instances were the same cell, ...
 % just different set of stimuli (usually when one set of stimuli were
@@ -60,7 +63,7 @@ unq_expts = unique(rootname); % some different experiment instances were the sam
 % RepExptsDat = [];
 % for iexpt = 1:size(repexpts,1)
 % 
-%     load([r.Dir.Expt repexpts{iexpt}])
+%     load([r.Dir.2014msRepo_expt repexpts{iexpt}])
 %     RepExptsDat(iexpt).exptname = expt.name;
 %     vmexpt = filtesweeps(expt,0,'Vm',0);
 %     hfig = figure;plot(HighpassGeneral(vmexpt.wc.data,1/expt.wc.dt)')
@@ -97,7 +100,7 @@ for iunq = 1:size(unqexpts,1)
     sigind = 1;
     for icell = 1:size(repexpts,1)
         if strcmp(unqexpts{iunq},repexpts{icell}(1:19))
-            load([r.Dir.Expt repexpts{icell}])
+            load([r.Dir.2014msRepo_expt repexpts{icell}])
             
             %make a list of all stims for which there were more than 5
             %trials
@@ -486,7 +489,7 @@ title(['n = ' num2str(size(idx,1))]);
 %% response window analysis on membrane potential and spiking
 
 % (can load this:
-% load([r.Dir.Expt 'Analysis/Meta_Responses_DB/exptsForICanal_revised2.mat'])
+% load([r.Dir.2014msRepo_expt 'Analysis/Meta_Responses_DB/exptsForICanal_revised2.mat'])
 % to look at this analysis without re-doing the prep for it)
 
 % right now, this analysis uses clipping spikes method instead of median
@@ -570,7 +573,7 @@ for iunq = 1:size(unq_expts,2)
     for iexpt=1:size(repexpts,1)
         if ~isempty(regexp(repexpts{iexpt},this_cell))
             thisexpt=repexpts{iexpt};
-            load([r.Dir.Expt thisexpt])
+            load([r.Dir.2014msRepo_expt thisexpt])
                         
             vmexpt=filtesweeps(expt,0,'Vm',0); %filter expt for 0 mV assuming
             % for now do not care if db or not. else: [dbstimcond,dblevels]=getDBstimcond(vmexpt);
@@ -1527,7 +1530,7 @@ for icell=1:size(dat,2)
     if getnoisefloor == 1
         matname = 'KmeansAccVmMeta5StimsNoise';
     end
-%     save([r.Dir.Expt '/Analysis/KmeansAccVm/' matname '.mat'], ...
+%     save([r.Dir.2014msRepo_expt '/Analysis/KmeansAccVm/' matname '.mat'], ...
 %         'MaxTotKeyacc', 'MaxAvgKeyacc','binsizeVec')
 end
 
@@ -1596,7 +1599,7 @@ prestim_len = round(prestim_time/expt.wc.dt);
 for iexpt=1:size(repexpts,1)
     %         if ~isempty(regexp(repexpts{iexpt},unq_expts{iunq}))
     thisexpt=repexpts{iexpt};
-    load([r.Dir.Expt thisexpt])
+    load([r.Dir.2014msRepo_expt thisexpt])
     vmexpt=filtesweeps(expt,0,'Vm',0); %filter expt for 0 mV assuming
     table=getClampTab(expt,{'clamp',0});
     keepsigs=reprequire(table,trials);
@@ -1741,7 +1744,7 @@ postoffset_len = min(alldatalen - alloff);
 for iexpt=1:size(repexpts,1)
     %         if ~isempty(regexp(repexpts{iexpt},unq_expts{iunq}))
     thisexpt=repexpts{iexpt};
-    load([r.Dir.Expt thisexpt])
+    load([r.Dir.2014msRepo_expt thisexpt])
     vmexpt=filtesweeps(expt,0,'Vm',0); %filter expt for 0 mV assuming
     table=getClampTab(expt,{'clamp',0});
     thiscond=getsubstimcond(expt.stimcond,table.sigsplayed);
